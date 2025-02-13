@@ -1,32 +1,51 @@
-import random
+def get_task(filename):
+    with open(filename, 'rt', encoding='utf-8') as f:
+        data = f.read().splitlines()
+        print(data)
+        rows, cols = [int(x) for x in data[0].split('x')]
+        transport_table = [[int(x) for x in line.split()]
+                           for line in data[1:rows + 1]]
+        reserves = [int(x) for x in data[-2].split()]
+        needs = [int(x) for x in data[-1].split()]
+        return rows, cols, transport_table, reserves, needs
+
+
 # Матрица цен (стоимости)
 price_matrix = []
-n = int(input("Строки: "))
-m = int(input("Столбцы: "))
-for i in range(n):
-    row = []
+n, m, list_ai, list_bj = 0, 0, [], []
+answer = input('Ручной ввод (h) / Ввод из файла (f): ')
+if answer == 'h':
+    n = int(input("Строки: "))
+    m = int(input("Столбцы: "))
+    for i in range(n):
+        row = []
+        for j in range(m):
+            price = input(f"Цена {i+1} {j+1}: ")
+            row.append(price)
+            # row.append(random.randint(0, 10))
+        price_matrix.append(row)
+    print(price_matrix)
+    # Готовая матрица
+    # price_matrix = [['40', '36', '9', '20', '0'], ['26', '11', '22', '26', '0'], ['6', '3', '12', '3', '0'], ['5', '37', '33', '26', '0']]
+    # Ответ: [[24, 'x', 'x', 'x', 'x'], [11, 29, 2, 'x', 'x'], ['x', 'x', 19, 4, 'x'], ['x', 'x', 'x', 31, 5]]
+
+    # Запасы и потребности
+    list_ai = []
+    for i in range(n):
+        ai = int(input(f"Запасы продукта {i+1}: "))
+        list_ai.append(ai)
+    # list_ai = [24, 42, 23, 36]
+
+    list_bj = []
     for j in range(m):
-        price = input(f"Цена {i+1} {j+1}: ")
-        row.append(price)
-        # row.append(random.randint(0, 10))
-    price_matrix.append(row)
-print(price_matrix)
-# Готовая матрица
-# price_matrix = [['40', '36', '9', '20', '0'], ['26', '11', '22', '26', '0'], ['6', '3', '12', '3', '0'], ['5', '37', '33', '26', '0']]
-# Ответ: [[24, 'x', 'x', 'x', 'x'], [11, 29, 2, 'x', 'x'], ['x', 'x', 19, 4, 'x'], ['x', 'x', 'x', 31, 5]]
+        bj = int(input(f"Потреба продукта {j+1}: "))
+        list_bj.append(bj)
+    # list_bj = [35, 29, 21, 35, 5]
 
-# Запасы и потребности
-list_ai = []
-for i in range(n):
-    ai = int(input(f"Запасы продукта {i+1}: "))
-    list_ai.append(ai)
-# list_ai = [24, 42, 23, 36]
+else:
+    n, m, price_matrix, list_ai, list_bj = get_task('data/task_3.txt')
 
-list_bj = []
-for j in range(m):
-    bj = int(input(f"Потреба продукта {j+1}: "))
-    list_bj.append(bj)
-# list_bj = [35, 29, 21, 35, 5]
+
 
 #Делаем открытый тип (задание называется Открытый тип)
 # if sum(list_ai)==sum(list_bj):
@@ -36,22 +55,24 @@ for j in range(m):
 # print(list_bj)
 
 #Приведение к закрытому типу
-if sum(list_ai)>sum(list_bj):
-    b_new = sum(list_ai)-sum(list_bj)
+if sum(list_ai) > sum(list_bj):
+    b_new = sum(list_ai) - sum(list_bj)
     list_bj.append(b_new)
-    m+=1
+    m += 1
     for i in range(n):
         price_matrix[i].append(0)
-elif sum(list_ai)<sum(list_bj):
-    a_new = sum(list_bj)-sum(list_ai)
+
+elif sum(list_ai) < sum(list_bj):
+    a_new = sum(list_bj) - sum(list_ai)
     list_ai.append(a_new)
-    n+=1
+    n += 1
     zeros = []
     for i in range(m):
         zeros.append(0)
     price_matrix.append(zeros)
 print(price_matrix)
 bas_var = n+m-1
+
 # Транспортная таблица (пустая)
 trans_table = []
 for i in range(n):
@@ -60,37 +81,73 @@ for i in range(n):
         row.append("-")
     trans_table.append(row)
 print(trans_table)
-#Метод СЗ угла - можно просто через цикл, он будет всегда оказываться слева сверху по порядку обхода
-for i in range(n):
-    for j in range(m):
-        if trans_table[i][j] == "-":
-            ai = list_ai[i]
-            bj = list_bj[j]
-            bas = min(ai, bj)
-            trans_table[i][j] = bas
-            list_ai[i] = ai - bas
-            list_bj[j] = bj - bas
-            if ai == bas:
-                for k in range(m):
-                    if trans_table[i][k] == "-":
-                        trans_table[i][k] = "x"
-            elif bj == bas:
-                for k in range(n):
-                    if trans_table[k][j] == "-":
-                        trans_table[k][j] = "x"
-                
-print(trans_table)
+
+# #Метод СЗ угла - можно просто через цикл, он будет всегда оказываться слева сверху по порядку обхода
+# for i in range(n):
+#     for j in range(m):
+#         if trans_table[i][j] == "-":
+#             ai = list_ai[i]
+#             bj = list_bj[j]
+#             bas = min(ai, bj)
+#             trans_table[i][j] = bas
+#             list_ai[i] = ai - bas
+#             list_bj[j] = bj - bas
+#             if ai == bas:
+#                 for k in range(m):
+#                     if trans_table[i][k] == "-":
+#                         trans_table[i][k] = "x"
+#             elif bj == bas:
+#                 for k in range(n):
+#                     if trans_table[k][j] == "-":
+#                         trans_table[k][j] = "x"
+#
+# print(trans_table)
+
+# Поиск индексов элементов в порядке возрастания их стоимости
+all_prices = [price_matrix[i][j] for i in range(n) for j in range(m)]
+all_prices.sort()
+pos = 0
+indexes = []
+stop = False
+while not stop:
+    for i in range(n):
+        cur_elem = all_prices[pos]
+        if cur_elem in price_matrix[i]:
+            indexes.append((i, price_matrix[i].index(cur_elem)))
+            pos += 1
+            if pos == m * n:
+                stop = True
+                break
+
+# Метод минимальной стоимости
+for index in indexes:
+    i, j = index
+    if trans_table[i][j] == "-":
+        ai = list_ai[i]
+        bj = list_bj[j]
+        bas = min(ai, bj)
+        trans_table[i][j] = bas
+        list_ai[i] = ai - bas
+        list_bj[j] = bj - bas
+        if ai == bas:
+            for k in range(m):
+                if trans_table[i][k] == "-":
+                    trans_table[i][k] = "x"
+        elif bj == bas:
+            for k in range(n):
+                if trans_table[k][j] == "-":
+                    trans_table[k][j] = "x"
 
 # Метод потенциалов (создание ui и vj)
 list_ui = []
 list_vj = []
 list_ui.append(0)
-for i in range(n-1):
+for i in range(n - 1):
     list_ui.append("-")
 for j in range(m):
     list_vj.append("-")
 
-while(True):
+while True:
     for i in range(n):
         if list_ui[i] != "-":
             for j in range(m):
@@ -105,6 +162,7 @@ while(True):
         break
 print(list_ui)
 print(list_vj)
+
 # "Ведущий" элемент, с которого начнется цикл пересчета; delta price - разница псевдостоимости и стоимости, если она > 0, т. е. псевдо ст. > ст., то условие не выполнено и нужно пересчитывать
 lead_deltaprice = 0
 lead_row = 0
