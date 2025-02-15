@@ -163,6 +163,9 @@ while True:
 print(list_ui)
 print(list_vj)
 
+# Список нехороших клеток
+bad_cells = []
+
 # "Ведущий" элемент, с которого начнется цикл пересчета; delta price - разница псевдостоимости и стоимости, если она > 0, т. е. псевдо ст. > ст., то условие не выполнено и нужно пересчитывать
 lead_deltaprice = 0
 lead_row = 0
@@ -174,10 +177,39 @@ for i in range(n):
             lead_deltaprice = ps_price - int(price_matrix[i][j])
             lead_row = i
             lead_col = j
+            bad_cells.append((i, j))
 
 if lead_deltaprice == 0:
     print("Оптимальненько")
 # else:
+
+# Цикл пересчета
+# Поиск клеток, по которым пройдет цикл
+cycle = []
+bad_cell = bad_cells[0]
+for vert in range(n):
+    if trans_table[vert][bad_cell[1]].isalnum():
+        for gor in range(m):
+            if trans_table[bad_cell[0]][gor].isalnum():
+                if (vert, gor) != bad_cell:
+                    if trans_table[vert][gor].isalnum():
+                        cycle = [bad_cell, (vert, bad_cell[1]), (vert, gor), (bad_cell[0], gor)]
+
+d = min(trans_table[cycle[1][0]][cycle[1][1]], trans_table[cycle[3][0]][cycle[3][1]])
+# Пересчет иксов
+count = 0
+for i, j in cycle:
+    if count % 2 == 0:
+        if not trans_table[i][j].isalnum():
+            trans_table[i][j] = d
+        else:
+            trans_table[i][j] += d
+    else:
+        if trans_table[i][j] == d:
+            trans_table[i][j] = '-'
+        else:
+            trans_table[i][j] -= d
+
 
 # Далее каким-то образом идет по базисным, поворачивая на 90 градусов и образуя цикл (не ясно, может ли цикл быть не квадратом, а больше)
 ######
