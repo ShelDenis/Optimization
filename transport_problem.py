@@ -71,7 +71,7 @@ elif sum(list_ai) < sum(list_bj):
         zeros.append(0)
     price_matrix.append(zeros)
 print(price_matrix)
-bas_var = n+m-1
+bas_var = n + m - 1
 
 # Транспортная таблица (пустая)
 trans_table = []
@@ -80,18 +80,20 @@ for i in range(n):
     for j in range(m):
         row.append("-")
     trans_table.append(row)
-print(trans_table)
+# print(trans_table)
 
-# #Метод СЗ угла - можно просто через цикл, он будет всегда оказываться слева сверху по порядку обхода
+# Метод СЗ угла - можно просто через цикл, он будет всегда оказываться слева сверху по порядку обхода
+# tmp_list_ai = list_ai[:]
+# tmp_list_bj = list_bj[:]
 # for i in range(n):
 #     for j in range(m):
 #         if trans_table[i][j] == "-":
-#             ai = list_ai[i]
-#             bj = list_bj[j]
+#             ai = tmp_list_ai[i]
+#             bj = tmp_list_bj[j]
 #             bas = min(ai, bj)
 #             trans_table[i][j] = bas
-#             list_ai[i] = ai - bas
-#             list_bj[j] = bj - bas
+#             tmp_list_ai[i] = ai - bas
+#             tmp_list_bj[j] = bj - bas
 #             if ai == bas:
 #                 for k in range(m):
 #                     if trans_table[i][k] == "-":
@@ -120,15 +122,17 @@ while not stop:
                 break
 
 # Метод минимальной стоимости
+tmp_list_ai = list_ai[:]
+tmp_list_bj = list_bj[:]
 for index in indexes:
     i, j = index
     if trans_table[i][j] == "-":
-        ai = list_ai[i]
-        bj = list_bj[j]
+        ai = tmp_list_ai[i]
+        bj = tmp_list_bj[j]
         bas = min(ai, bj)
         trans_table[i][j] = bas
-        list_ai[i] = ai - bas
-        list_bj[j] = bj - bas
+        tmp_list_ai[i] = ai - bas
+        tmp_list_bj[j] = bj - bas
         if ai == bas:
             for k in range(m):
                 if trans_table[i][k] == "-":
@@ -138,78 +142,99 @@ for index in indexes:
                 if trans_table[k][j] == "-":
                     trans_table[k][j] = "x"
 
-# Метод потенциалов (создание ui и vj)
-list_ui = []
-list_vj = []
-list_ui.append(0)
-for i in range(n - 1):
-    list_ui.append("-")
-for j in range(m):
-    list_vj.append("-")
+print(trans_table)
 
 while True:
+    # Метод потенциалов (создание ui и vj)
+    list_ui = []
+    list_vj = []
+    list_ui.append(0)
+    for i in range(n - 1):
+        list_ui.append("-")
+    for j in range(m):
+        list_vj.append("-")
+
+    while True:
+        for i in range(n):
+            if list_ui[i] != "-":
+                for j in range(m):
+                    if trans_table[i][j] != "x":
+                        list_vj[j] = int(price_matrix[i][j]) - list_ui[i]
+        for j in range(m):
+            if list_vj[j] != "-":
+                for i in range(n):
+                    if trans_table[i][j] != "x":
+                        list_ui[i] = int(price_matrix[i][j]) - list_vj[j]
+        if "-" not in list_ui and "-" not in list_vj:
+            break
+    print(list_ui)
+    print(list_vj)
+
+    # Список нехороших клеток
+    bad_cells = []
+
+    # "Ведущий" элемент, с которого начнется цикл пересчета; delta price - разница псевдостоимости и стоимости, если она > 0, т. е. псевдо ст. > ст., то условие не выполнено и нужно пересчитывать
+    lead_deltaprice = 0
+    lead_row = 0
+    lead_col = 0
     for i in range(n):
-        if list_ui[i] != "-":
+        for j in range(m):
+            ps_price = list_ui[i] + list_vj[j]
+            # if ps_price - int(price_matrix[i][j]) > lead_deltaprice:
+            #     lead_deltaprice = ps_price - int(price_matrix[i][j])
+            #     lead_row = i
+            #     lead_col = j
+            #     bad_cells.append((i, j))
+            if ps_price > price_matrix[i][j]:
+                bad_cells.append((i, j))
+
+    # if lead_deltaprice == 0:
+    if len(bad_cells) == 0:
+        print("Оптимальненько")
+        # Поиск L*
+        l_optimal = 0
+        for i in range(n):
             for j in range(m):
-                if trans_table[i][j] != "x":
-                    list_vj[j] = int(price_matrix[i][j]) - list_ui[i]
-    for j in range(m):
-        if list_vj[j] != "-":
-            for i in range(n):
-                if trans_table[i][j] != "x":
-                    list_ui[i] = int(price_matrix[i][j]) - list_vj[j]
-    if "-" not in list_ui and "-" not in list_vj:
+                if str(trans_table[i][j]).isdigit():
+                    l_optimal += trans_table[i][j] * price_matrix[i][j]
+        print(f'L* = {l_optimal}')
+        # Оптимальное значение найдено => завершение работы алгоритма
         break
-print(list_ui)
-print(list_vj)
-
-# Список нехороших клеток
-bad_cells = []
-
-# "Ведущий" элемент, с которого начнется цикл пересчета; delta price - разница псевдостоимости и стоимости, если она > 0, т. е. псевдо ст. > ст., то условие не выполнено и нужно пересчитывать
-lead_deltaprice = 0
-lead_row = 0
-lead_col = 0
-for i in range(n):
-    for j in range(m):
-        ps_price = list_ui[i] + list_bj[j]
-        if ps_price - int(price_matrix[i][j]) > lead_deltaprice:
-            lead_deltaprice = ps_price - int(price_matrix[i][j])
-            lead_row = i
-            lead_col = j
-            bad_cells.append((i, j))
-
-if lead_deltaprice == 0:
-    print("Оптимальненько")
-# else:
-
-# Цикл пересчета
-# Поиск клеток, по которым пройдет цикл
-cycle = []
-bad_cell = bad_cells[0]
-for vert in range(n):
-    if trans_table[vert][bad_cell[1]].isalnum():
-        for gor in range(m):
-            if trans_table[bad_cell[0]][gor].isalnum():
-                if (vert, gor) != bad_cell:
-                    if trans_table[vert][gor].isalnum():
-                        cycle = [bad_cell, (vert, bad_cell[1]), (vert, gor), (bad_cell[0], gor)]
-
-d = min(trans_table[cycle[1][0]][cycle[1][1]], trans_table[cycle[3][0]][cycle[3][1]])
-# Пересчет иксов
-count = 0
-for i, j in cycle:
-    if count % 2 == 0:
-        if not trans_table[i][j].isalnum():
-            trans_table[i][j] = d
-        else:
-            trans_table[i][j] += d
     else:
-        if trans_table[i][j] == d:
-            trans_table[i][j] = '-'
-        else:
-            trans_table[i][j] -= d
 
+        # Цикл пересчета
+        # Поиск клеток, по которым пройдет цикл
+        print('Зашли в цикл пересчета')
+        cycle = []
+        bad_cell = bad_cells[0]
+        for vert in range(n):
+            if cycle:
+                break
+            if str(trans_table[vert][bad_cell[1]]).isdigit():
+                for gor in range(m):
+                    if str(trans_table[bad_cell[0]][gor]).isdigit():
+                        if (vert, gor) != bad_cell:
+                            if str(trans_table[vert][gor]).isdigit():
+                                cycle = [bad_cell, (vert, bad_cell[1]), (vert, gor), (bad_cell[0], gor)]
+                                break
+
+        d = min(trans_table[cycle[1][0]][cycle[1][1]], trans_table[cycle[3][0]][cycle[3][1]])
+        # Пересчет иксов
+        count = 0
+        for i, j in cycle:
+            if count % 2 == 0:
+                if not str(trans_table[i][j]).isdigit():
+                    trans_table[i][j] = d
+                else:
+                    trans_table[i][j] += d
+            else:
+                if trans_table[i][j] == d:
+                    trans_table[i][j] = '-'
+                else:
+                    trans_table[i][j] -= d
+            count += 1
+
+        print(trans_table)
 
 # Далее каким-то образом идет по базисным, поворачивая на 90 градусов и образуя цикл (не ясно, может ли цикл быть не квадратом, а больше)
 ######
