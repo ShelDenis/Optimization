@@ -22,37 +22,22 @@ if answer == 'h':
         for j in range(m):
             price = input(f"Цена {i+1} {j+1}: ")
             row.append(price)
-            # row.append(random.randint(0, 10))
         price_matrix.append(row)
     print(price_matrix)
-    # Готовая матрица
-    # price_matrix = [['40', '36', '9', '20', '0'], ['26', '11', '22', '26', '0'], ['6', '3', '12', '3', '0'], ['5', '37', '33', '26', '0']]
-    # Ответ: [[24, 'x', 'x', 'x', 'x'], [11, 29, 2, 'x', 'x'], ['x', 'x', 19, 4, 'x'], ['x', 'x', 'x', 31, 5]]
 
     # Запасы и потребности
     list_ai = []
     for i in range(n):
         ai = int(input(f"Запасы продукта {i+1}: "))
         list_ai.append(ai)
-    # list_ai = [24, 42, 23, 36]
 
     list_bj = []
     for j in range(m):
         bj = int(input(f"Потреба продукта {j+1}: "))
         list_bj.append(bj)
-    # list_bj = [35, 29, 21, 35, 5]
 
 else:
-    n, m, price_matrix, list_ai, list_bj = get_task('data/task_3.txt')
-
-
-
-#Делаем открытый тип (задание называется Открытый тип)
-# if sum(list_ai)==sum(list_bj):
-#     el = list_bj.pop()
-#     list_bj.append(el+1)
-# print(list_ai)
-# print(list_bj)
+    n, m, price_matrix, list_ai, list_bj = get_task('data/task_cl_wk.txt')
 
 #Приведение к закрытому типу
 if sum(list_ai) > sum(list_bj):
@@ -80,69 +65,68 @@ for i in range(n):
     for j in range(m):
         row.append("-")
     trans_table.append(row)
-# print(trans_table)
 
 # Метод СЗ угла - можно просто через цикл, он будет всегда оказываться слева сверху по порядку обхода
-# tmp_list_ai = list_ai[:]
-# tmp_list_bj = list_bj[:]
-# for i in range(n):
-#     for j in range(m):
-#         if trans_table[i][j] == "-":
-#             ai = tmp_list_ai[i]
-#             bj = tmp_list_bj[j]
-#             bas = min(ai, bj)
-#             trans_table[i][j] = bas
-#             tmp_list_ai[i] = ai - bas
-#             tmp_list_bj[j] = bj - bas
-#             if ai == bas:
-#                 for k in range(m):
-#                     if trans_table[i][k] == "-":
-#                         trans_table[i][k] = "x"
-#             elif bj == bas:
-#                 for k in range(n):
-#                     if trans_table[k][j] == "-":
-#                         trans_table[k][j] = "x"
-#
-# print(trans_table)
-
-# Поиск индексов элементов в порядке возрастания их стоимости
-all_prices = [price_matrix[i][j] for i in range(n) for j in range(m)]
-all_prices.sort()
-pos = 0
-indexes = []
-stop = False
-while not stop:
-    for i in range(n):
-        cur_elem = all_prices[pos]
-        if cur_elem in price_matrix[i]:
-            indexes.append((i, price_matrix[i].index(cur_elem)))
-            pos += 1
-            if pos == m * n:
-                stop = True
-                break
-
-# Метод минимальной стоимости
 tmp_list_ai = list_ai[:]
 tmp_list_bj = list_bj[:]
-for index in indexes:
-    i, j = index
-    if trans_table[i][j] == "-":
-        ai = tmp_list_ai[i]
-        bj = tmp_list_bj[j]
-        bas = min(ai, bj)
-        trans_table[i][j] = bas
-        tmp_list_ai[i] = ai - bas
-        tmp_list_bj[j] = bj - bas
-        if ai == bas:
-            for k in range(m):
-                if trans_table[i][k] == "-":
-                    trans_table[i][k] = "x"
-        elif bj == bas:
-            for k in range(n):
-                if trans_table[k][j] == "-":
-                    trans_table[k][j] = "x"
+for i in range(n):
+    for j in range(m):
+        if trans_table[i][j] == "-":
+            ai = tmp_list_ai[i]
+            bj = tmp_list_bj[j]
+            bas = min(ai, bj)
+            trans_table[i][j] = bas
+            tmp_list_ai[i] = ai - bas
+            tmp_list_bj[j] = bj - bas
+            if ai == bas:
+                for k in range(m):
+                    if trans_table[i][k] == "-":
+                        trans_table[i][k] = "x"
+            elif bj == bas:
+                for k in range(n):
+                    if trans_table[k][j] == "-":
+                        trans_table[k][j] = "x"
 
 print(trans_table)
+
+# Поиск индексов элементов в порядке возрастания их стоимости
+# all_prices = [price_matrix[i][j] for i in range(n) for j in range(m)]
+# all_prices.sort()
+# pos = 0
+# indexes = []
+# stop = False
+# while not stop:
+#     for i in range(n):
+#         cur_elem = all_prices[pos]
+#         if cur_elem in price_matrix[i]:
+#             indexes.append((i, price_matrix[i].index(cur_elem)))
+#             pos += 1
+#             if pos == m * n:
+#                 stop = True
+#                 break
+
+# # Метод минимальной стоимости
+# tmp_list_ai = list_ai[:]
+# tmp_list_bj = list_bj[:]
+# for index in indexes:
+#     i, j = index
+#     if trans_table[i][j] == "-":
+#         ai = tmp_list_ai[i]
+#         bj = tmp_list_bj[j]
+#         bas = min(ai, bj)
+#         trans_table[i][j] = bas
+#         tmp_list_ai[i] = ai - bas
+#         tmp_list_bj[j] = bj - bas
+#         if ai == bas:
+#             for k in range(m):
+#                 if trans_table[i][k] == "-":
+#                     trans_table[i][k] = "x"
+#         elif bj == bas:
+#             for k in range(n):
+#                 if trans_table[k][j] == "-":
+#                     trans_table[k][j] = "x"
+#
+# print(trans_table)
 
 while True:
     # Метод потенциалов (создание ui и vj)
@@ -179,16 +163,11 @@ while True:
     lead_col = 0
     for i in range(n):
         for j in range(m):
-            ps_price = list_ui[i] + list_vj[j]
-            # if ps_price - int(price_matrix[i][j]) > lead_deltaprice:
-            #     lead_deltaprice = ps_price - int(price_matrix[i][j])
-            #     lead_row = i
-            #     lead_col = j
-            #     bad_cells.append((i, j))
-            if ps_price > price_matrix[i][j]:
-                bad_cells.append((i, j))
+            if str(trans_table[i][j]) in '-x':
+                ps_price = list_ui[i] + list_vj[j]
+                if ps_price > price_matrix[i][j]:
+                    bad_cells.append((i, j))
 
-    # if lead_deltaprice == 0:
     if len(bad_cells) == 0:
         print("Оптимальненько")
         # Поиск L*
@@ -201,22 +180,26 @@ while True:
         # Оптимальное значение найдено => завершение работы алгоритма
         break
     else:
-
         # Цикл пересчета
         # Поиск клеток, по которым пройдет цикл
         print('Зашли в цикл пересчета')
         cycle = []
-        bad_cell = bad_cells[0]
-        for vert in range(n):
-            if cycle:
+        stop = False
+        for bc in bad_cells:
+            if stop:
                 break
-            if str(trans_table[vert][bad_cell[1]]).isdigit():
-                for gor in range(m):
-                    if str(trans_table[bad_cell[0]][gor]).isdigit():
-                        if (vert, gor) != bad_cell:
-                            if str(trans_table[vert][gor]).isdigit():
-                                cycle = [bad_cell, (vert, bad_cell[1]), (vert, gor), (bad_cell[0], gor)]
-                                break
+            bad_cell = bc
+            for vert in range(n):
+                if cycle:
+                    stop = True
+                    break
+                if str(trans_table[vert][bad_cell[1]]).isdigit():
+                    for gor in range(m):
+                        if str(trans_table[bad_cell[0]][gor]).isdigit():
+                            if (vert, gor) != bad_cell:
+                                if str(trans_table[vert][gor]).isdigit():
+                                    cycle = [bad_cell, (vert, bad_cell[1]), (vert, gor), (bad_cell[0], gor)]
+                                    break
 
         d = min(trans_table[cycle[1][0]][cycle[1][1]], trans_table[cycle[3][0]][cycle[3][1]])
         # Пересчет иксов
@@ -229,20 +212,9 @@ while True:
                     trans_table[i][j] += d
             else:
                 if trans_table[i][j] == d:
-                    trans_table[i][j] = '-'
+                    trans_table[i][j] = 'x'
                 else:
                     trans_table[i][j] -= d
             count += 1
 
         print(trans_table)
-
-# Далее каким-то образом идет по базисным, поворачивая на 90 градусов и образуя цикл (не ясно, может ли цикл быть не квадратом, а больше)
-######
-#    #
-#    #
-#    ######
-#         #
-###########
-# типо такого
-
-# Когда сделаем цикл пересчета, нужно будет всё, начиная с метода СЗ, завернуть в цикл, пока не выполнится условие (псевдо ст. <= ст.)
