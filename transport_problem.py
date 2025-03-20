@@ -37,7 +37,7 @@ if answer == 'h':
         list_bj.append(bj)
 
 else:
-    n, m, price_matrix, list_ai, list_bj = get_task('data/task_cl_wk.txt')
+    n, m, price_matrix, list_ai, list_bj = get_task('data/task_open.txt')
 
 #Приведение к закрытому типу
 if sum(list_ai) > sum(list_bj):
