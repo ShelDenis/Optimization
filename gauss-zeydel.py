@@ -16,6 +16,16 @@ def norma(v):
     return sq_sum ** 0.5
 
 
+def gradient(func, point):
+    x1, x2 = sp.symbols('x1 x2')
+    grad_vector = []
+    for var in [x1, x2]:
+        df = sp.diff(4 * x1 ** 2 + (x2 - 2) ** 2, var)
+        d = sp.lambdify((x1, x2), df)
+        grad_vector.append(-d(*point))
+    return grad_vector
+
+
 eps = 0.01
 x1, x2, a = sp.symbols('x1 x2 a')
 x = [2, 2]
