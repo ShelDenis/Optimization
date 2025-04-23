@@ -5,7 +5,7 @@ from scipy.optimize import minimize
 x1, x2 = sp.symbols('x1 x2')
 
 eps = 0.01
-max_iter = 100
+max_iter = 10
 r = 1
 
 f = 2 * x1 ** 2 + 5 * x2 ** 2
@@ -18,7 +18,7 @@ gs = [
 # Они все >= 0
 
 penalty = lambda x_vec: r * sum([
-    max(-g.subs({x1: x_vec[0], x2: x_vec[1]}), 0) ** 2
+    (1 / g).subs({x1: x_vec[0], x2: x_vec[1]})
     for g in gs
 ])
 
@@ -35,6 +35,9 @@ for k in range(max_iter):
 
     if abs(penalty_value) <= eps:
         break
+
+    r *= 2
+    x = x_opt
 
 print(f"x* = {x_opt}")
 print(f"f* = {f.subs({x1: x_opt[0], x2: x_opt[1]}):.2f}")
