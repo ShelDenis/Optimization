@@ -3,7 +3,7 @@ import numpy as np
 from scipy.optimize import minimize, NonlinearConstraint
 import random
 
-x1, x2 = sp.symbols('x x1 x2')
+x1, x2 = sp.symbols('x1 x2')
 
 
 def f1(x):
